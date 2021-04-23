@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 const dbConnection= require('./config/db');
-
+const errorhandler = require('./middleware/errorHandler')
 
 // Route File
 const coachingCenter = require('./route/coschingCentre')
@@ -23,9 +23,8 @@ app.use(morgan('dev'));
 
 
 //Mount Route
-
 app.use('/api/v1/bootcamps', coachingCenter)
-
+app.use(errorhandler)
 
 const PORT = process.env.PORT || 5000
 

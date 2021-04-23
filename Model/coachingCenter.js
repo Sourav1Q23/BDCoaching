@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const geocoder = require('./../config/geocoder')
 
 const CoachingCenterSChema = new mongoose.Schema(
   {
@@ -104,5 +105,28 @@ const CoachingCenterSChema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
+// Creating Slug Field
 
+CoachingCenterSChema.pre('save', function(next) {
+    this.slug = slugify(this.name, { lower: true });
+    next();
+  });
+
+// Geocode & create location field
+CoachingCenterSChema.pre('save', async function(next) {
+    const address = await geocoder.geocode(this.address);
+    this.location = {
+      type: 'Point',
+      coordinates: [address[0].longitude, address[0].latitude],
+      formattedAddress: address[0].formattedAddress,
+      street: address[0].streetName,
+      city: address[0].city,
+      state: address[0].stateCode,
+      zipcode: address[0].zipcode,
+      country: address[0].countryCode
+    };
+    this.address = undefined;
+    next();
+  });
+  
 module.exports = mongoose.model('CoachingCenter', CoachingCenterSChema);
