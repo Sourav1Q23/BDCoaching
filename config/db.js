@@ -11,7 +11,7 @@ const dbConnection = async ()=>{
         useFindAndModify: false,
         useUnifiedTopology: true
     })
-        console.log("DB connection successul".cyan.underline)
+    console.log("DB connection successul".cyan.underline)
 }
 
 module.exports = dbConnection

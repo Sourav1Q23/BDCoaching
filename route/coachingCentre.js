@@ -1,13 +1,15 @@
 const express = require('express');
-const router =  express.Router();
 const { getCoachingcenters,
         getCoachingcenter,
         createCoachingcenter,
         updateCoachingcenter,
         deleteCoachingcenter,
         getCoachingCenterInRadius
-} = require('./../controller/coachingCenter' )
+} = require('../controller/coachingCenter' )
+const courseRouter= require('./courses'); 
 
+const router =  express.Router();
+router.use('/:coachingCenterId/courses', courseRouter)
 
 router.get('/radius/:zipcode/:distance', getCoachingCenterInRadius)
 router.get('/:id',getCoachingcenter);

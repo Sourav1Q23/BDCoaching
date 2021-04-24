@@ -6,27 +6,27 @@ const dbConnection= require('./config/db');
 const errorhandler = require('./middleware/errorHandler')
 
 // Route File
-const coachingCenter = require('./route/coschingCentre')
+const coachingCenterRouter = require('./route/coachingCentre')
+const courseRouter = require('./route/courses');
 
 // Loading env varible
 dotenv.config({ path : './config/config.env' });
 
 // Connecting to Database
 dbConnection()
-
 const app = express()
 
 //Middleware
 app.use(express.json())
 app.use(morgan('dev'));
-//Body Parser
 
 
 //Mount Route
-app.use('/api/v1/coachingCenter', coachingCenter)
+app.use('/api/v1/coachingCenter', coachingCenterRouter)
+app.use('/api/v1/courses', courseRouter)
 app.use(errorhandler)
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3000
 
 const server= app.listen(PORT,
     console.log(`Server is running on port ${PORT}`.yellow.underline.bold))

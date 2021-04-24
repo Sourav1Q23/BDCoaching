@@ -25,7 +25,7 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
     
     console.log(queryStr);
 
-    query = CoachingCenter.find(JSON.parse(queryStr));
+    query = CoachingCenter.find(JSON.parse(queryStr)).populate('courses');
 
     if(req.query.select){
         const fields =  req.query.select.split(',').join(' ')
@@ -67,7 +67,7 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
          
     res.status(200).json({
         status: "Success",
-        resultLength: coachingsCenters.length,
+        resultLength: coachingCenters.length,
         pagination,
         data: coachingCenters
     });        
@@ -130,7 +130,7 @@ exports.updateCoachingcenter = asyncHandler(async (req, res , next) => {
 //access private
 
 exports.deleteCoachingcenter = asyncHandler(async(req, res , next) => {
-        const coachingCenter = await CoachingCenter.findByIdAndDelete(req.params.id)
+        const coachingCenter = await CoachingCenter.findById(req.params.id)
         
         if (!coachingCenter){
             return res.status(404).json({
@@ -138,6 +138,8 @@ exports.deleteCoachingcenter = asyncHandler(async(req, res , next) => {
                 data:null
             })
         }
+
+        coachingCenter.remove()
         res.status(200).json({
             status: "Success",
             data: {}
