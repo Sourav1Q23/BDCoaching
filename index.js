@@ -23,7 +23,7 @@ app.use(morgan('dev'));
 
 
 //Mount Route
-app.use('/api/v1/bootcamps', coachingCenter)
+app.use('/api/v1/coachingCenter', coachingCenter)
 app.use(errorhandler)
 
 const PORT = process.env.PORT || 5000

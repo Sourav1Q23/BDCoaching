@@ -1,16 +1,19 @@
 const express = require('express');
 const router =  express.Router();
-const { getBootcamps,
-        getBootcamp,
-        createBootcamp,
-        updateBootcamp,
-        deleteBootcamp
-} = require('./../controller/coachingCenter')
+const { getCoachingcenters,
+        getCoachingcenter,
+        createCoachingcenter,
+        updateCoachingcenter,
+        deleteCoachingcenter,
+        getCoachingCenterInRadius
+} = require('./../controller/coachingCenter' )
 
-router.get('/', getBootcamps);
-router.post('/', createBootcamp);
-router.get('/:id',getBootcamp);
-router.put('/:id',updateBootcamp);
-router.delete('/:id',deleteBootcamp);
+
+router.get('/radius/:zipcode/:distance', getCoachingCenterInRadius)
+router.get('/:id',getCoachingcenter);
+router.get('/', getCoachingcenters);
+router.post('/', createCoachingcenter);
+router.put('/:id',updateCoachingcenter);
+router.delete('/:id',deleteCoachingcenter);
 
 module.exports = router;
