@@ -1,3 +1,4 @@
+const path = require('path')
 const CoachingCenter= require('./../Model/coachingCenter');
 const ErrorClass = require('./../config/errorClass');
 const asyncHandler= require('./../middleware/asyncHandler');
@@ -15,17 +16,14 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
 
     const fieldRemove=['select','sort','limit','page']
 
-    fieldRemove.forEach( param=> delete reqQuery[param])
+    fieldRemove.forEach( param=> delete reqQuery[param]) 
 
-    console.log(reqQuery)
-
-    let queryStr = JSON.stringify(req.query);
+    let queryStr = JSON.stringify(reqQuery);
 
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match=> `$${match}`);
-    
-    console.log(queryStr);
+       
 
-    query = CoachingCenter.find(JSON.parse(queryStr)).populate('courses');
+    query = CoachingCenter.find(JSON.parse(queryStr)) //.populate('courses');
 
     if(req.query.select){
         const fields =  req.query.select.split(',').join(' ')
@@ -46,7 +44,7 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
     const total = await CoachingCenter.countDocuments()
     
     query = query.skip(startIndex).limit(limit);
-
+    
     const coachingCenters = await query;
 
     const pagination = {}
@@ -173,3 +171,45 @@ exports.getCoachingCenterInRadius = asyncHandler(async (req, res, next) => {
     });
   });
   
+//@desc Delete a Bootcamps
+//route DELETE api/v1/bootcamps/
+//access private
+
+exports.coachingCenterFileUpload = asyncHandler(async(req, res , next) => {
+    const coachingCenter = await CoachingCenter.findById(req.params.id)
+    
+    if (!coachingCenter){
+        return res.status(404).json({
+            success:false,
+            data:null
+        })
+    }
+    if (!req.files){
+        return next(new ErrorClass("No fle Uploaded",400))
+    }
+    const file= req.files.file
+    if(!file.mimetype.startsWith('image')){
+        return next(new ErrorClass("Please Upload an image File",400))
+    }
+
+    if(file.size > process.env.MAX_File_UPLOAD){
+        return next(new ErrorClass(`Please Upload an image File less than ${process.env.MAX_File_UPLOAD}`,400))
+    }
+
+    file.name=`photo_${coachingCenter._id}${path.parse(file.name).ext}`
+    
+    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+        if (err) {
+          console.error(err);
+          return next(new ErrorClass(`Problem with file upload`, 500));
+        }
+    
+        await CoachingCenter.findByIdAndUpdate(req.params.id, { photo: file.name });
+    
+      
+    res.status(200).json({
+        status: "Success",
+        data: file.name
+        });        
+    })
+})

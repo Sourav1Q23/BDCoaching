@@ -4,7 +4,8 @@ const { getCoachingcenters,
         createCoachingcenter,
         updateCoachingcenter,
         deleteCoachingcenter,
-        getCoachingCenterInRadius
+        getCoachingCenterInRadius,
+        coachingCenterFileUpload
 } = require('../controller/coachingCenter' )
 const courseRouter= require('./courses'); 
 
@@ -17,5 +18,6 @@ router.get('/', getCoachingcenters);
 router.post('/', createCoachingcenter);
 router.put('/:id',updateCoachingcenter);
 router.delete('/:id',deleteCoachingcenter);
+router.put('/:id/upload', coachingCenterFileUpload);
 
 module.exports = router;
