@@ -4,7 +4,6 @@ const ErrorClass = require('./../config/errorClass');
 const asyncHandler= require('./../middleware/asyncHandler');
 const geocoder = require('./../config/geocoder')
 
-
 //@desc Get All Bootcamps
 //route GET api/v1/bootcamps
 //access Public
@@ -23,7 +22,7 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match=> `$${match}`);
        
 
-    query = CoachingCenter.find(JSON.parse(queryStr)) //.populate('courses');
+    query = CoachingCenter.find(JSON.parse(queryStr)) .populate('courses');
 
     if(req.query.select){
         const fields =  req.query.select.split(',').join(' ')
@@ -93,12 +92,20 @@ exports.getCoachingcenter =asyncHandler(async (req, res , next) => {
 //access private
 
 exports.createCoachingcenter = asyncHandler(async (req, res , next) => {
-        const coachingCenter = await CoachingCenter.create(req.body)
-        
-        res.status(200).json({
-            status: "Success",
-            data: coachingCenter
-        });
+    req.body.user = req.user.id
+    
+    const publishedCoachingCenter = await CoachingCenter.findOne({ user:req.user.id})
+
+    if(publishedCoachingCenter && !req.user.role!=='admin'){
+        return next(new ErrorClass('The User already published a Coachin Ceter',401))
+    }
+
+    const coachingCenter = await CoachingCenter.create(req.body)
+    
+    res.status(200).json({
+        status: "Success",
+        data: coachingCenter
+    });
 })
 
 //@desc Update a Bootcamps
@@ -106,21 +113,28 @@ exports.createCoachingcenter = asyncHandler(async (req, res , next) => {
 //access private
 
 exports.updateCoachingcenter = asyncHandler(async (req, res , next) => {
-        const coachingCenter = await CoachingCenter.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        })
-        
-        if (!coachingCenter){
-            return res.status(404).json({
-                success:false,
-                data:null
-            })
-        }
-        res.status(200).json({
-            status: "Success",
-            data: coachingCenter
-        }); 
+    let coachingCenter= await CoachingCenter.findById(req.params.id)
+    
+    if (!coachingCenter){
+        return next(new ErrorClass(`No coaching center found with id ${req.params.id}`,404))
+    }
+    if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this CoachingCenter`,401))
+    }
+
+    coachingCenter = await CoachingCenter.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    })
+    
+    coachingCenter= await CoachingCenter.findByIdAndUpdate(req.params.id,req.body,{
+        new: true,
+        runValidators: true
+    })
+    res.status(200).json({
+        status: "Success",
+        data: coachingCenter
+    }); 
 })
 
 //@desc Delete a Bootcamps
@@ -131,10 +145,10 @@ exports.deleteCoachingcenter = asyncHandler(async(req, res , next) => {
         const coachingCenter = await CoachingCenter.findById(req.params.id)
         
         if (!coachingCenter){
-            return res.status(404).json({
-                success:false,
-                data:null
-            })
+            return next(new ErrorClass(`No coaching center found with id ${req.params.id}`,404))
+        }
+        if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
+            return next(new ErrorClass(`User ${req.user.id} is not authorziedto delete this CoachingCenter`,401))
         }
 
         coachingCenter.remove()
@@ -179,10 +193,10 @@ exports.coachingCenterFileUpload = asyncHandler(async(req, res , next) => {
     const coachingCenter = await CoachingCenter.findById(req.params.id)
     
     if (!coachingCenter){
-        return res.status(404).json({
-            success:false,
-            data:null
-        })
+        return next(new ErrorClass(`No coaching center found with id ${req.params.id}`,404))
+    }
+    if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this CoachingCenter`,401))
     }
     if (!req.files){
         return next(new ErrorClass("No fle Uploaded",400))

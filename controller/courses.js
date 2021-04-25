@@ -52,12 +52,18 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/coachingCenterId/:coachingCenterId/courses
 // @access    Private
 exports.createCourse = asyncHandler(async (req, res, next) => {
+    req.body.bootcamp =req.params.coachingCenterId
+    req.body.user = req.user.id;
+    
     const coachingCenter = await CoachingCenter.findById(req.params.coachingCenterId)
 
     if (!coachingCenter){
         return next(new ErrorClass(`Bad request`, 404))
     }
 
+    if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto Create the course`,401))
+    }
     req.body.bootcamp = req.params.coachingCenterId
 
     const course = await Course.create(req.body)
@@ -77,7 +83,9 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
     if (!course){
         return next(new ErrorClass(`Bad request`, 404))
     }
-
+    if (course.user.toString()!== req.user.id && req.user.role!=='admin'){
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this course`,401))
+    }
 
     course = await Course.findByIdAndUpdate(req.params.id, req.body, {
         new:true,
@@ -99,7 +107,9 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     if (!course){
         return next(new ErrorClass(`Bad request`, 404))
     }
-
+    if (course.user.toString()!== req.user.id && req.user.role!=='admin'){
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto delete this Course`,401))
+    }
 
     await course.remove();
 

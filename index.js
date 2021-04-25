@@ -4,13 +4,14 @@ const morgan = require('morgan');
 const path = require('path')
 const fileupload = require('express-fileupload');
 const colors = require('colors');
+const cookieParser = require('cookie-parser');
 const dbConnection= require('./config/db');
 const errorhandler = require('./middleware/errorHandler')
 
 // Route File
 const coachingCenterRouter = require('./route/coachingCentre')
 const courseRouter = require('./route/courses');
-
+const authRouter = require('./route/auth')
 // Loading env varible
 dotenv.config({ path : './config/config.env' });
 
@@ -19,15 +20,17 @@ dbConnection()
 const app = express()
 
 //Middleware
-app.use(express.json())
+app.use(express.json());
+app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(fileupload());
-app.use(express.static(path.join(__dirname,'public')))
+app.use(express.static(path.join(__dirname,'public')));
 
 
 //Mount Route
 app.use('/api/v1/coachingCenter', coachingCenterRouter)
 app.use('/api/v1/courses', courseRouter)
+app.use('/api/v1/auth', authRouter) 
 app.use(errorhandler)
 
 const PORT = process.env.PORT || 3000
