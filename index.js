@@ -12,6 +12,9 @@ const errorhandler = require('./middleware/errorHandler')
 const coachingCenterRouter = require('./route/coachingCentre')
 const courseRouter = require('./route/courses');
 const authRouter = require('./route/auth')
+const adminRouter = require('./route/user')
+const reviewRouter = require('./route/review')
+
 // Loading env varible
 dotenv.config({ path : './config/config.env' });
 
@@ -31,6 +34,8 @@ app.use(express.static(path.join(__dirname,'public')));
 app.use('/api/v1/coachingCenter', coachingCenterRouter)
 app.use('/api/v1/courses', courseRouter)
 app.use('/api/v1/auth', authRouter) 
+app.use('/api/v1/admin', adminRouter)
+app.use('/api/v1/reviews', reviewRouter)
 app.use(errorhandler)
 
 const PORT = process.env.PORT || 3000

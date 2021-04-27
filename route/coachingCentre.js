@@ -8,11 +8,13 @@ const { getCoachingcenters,
         coachingCenterFileUpload
 } = require('../controller/coachingCenter' )
 const courseRouter= require('./courses');
+const reviewRouter = require('./review')
 const { protect, authorize } = require('./../middleware/authMiddleware')
- 
+  
 
 const router =  express.Router();
 router.use('/:coachingCenterId/courses', courseRouter)
+router.use('/:coachingCenterId/reviews', reviewRouter)
 
 router.get('/radius/:zipcode/:distance', getCoachingCenterInRadius)
 router.get('/:id',getCoachingcenter);
