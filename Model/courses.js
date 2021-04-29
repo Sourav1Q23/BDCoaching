@@ -32,7 +32,7 @@ const CourseSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  bootcamp: {
+  coachingcenter: {
     type: mongoose.Schema.ObjectId,
     ref: 'CoachingCenter',
     required: true
@@ -48,11 +48,11 @@ const CourseSchema = new mongoose.Schema({
 CourseSchema.statics.getAverageCost = async function(coachingCenterId) {
     const obj = await this.aggregate([
       {
-        $match: { bootcamp: coachingCenterId }
+        $match: { coachingcenter: coachingCenterId }
       },
       {
         $group: {
-          _id: '$bootcamp',
+          _id: '$coachingcenter',
           averageCost: { $avg: '$tuition' }
         }
       }
@@ -69,12 +69,12 @@ CourseSchema.statics.getAverageCost = async function(coachingCenterId) {
   
   // Call getAverageCost after save
   CourseSchema.post('save', function() {
-    this.constructor.getAverageCost(this.bootcamp);
+    this.constructor.getAverageCost(this.coachingcenter);
   });
   
   // Call getAverageCost before remove
   CourseSchema.pre('remove', function() {
-    this.constructor.getAverageCost(this.bootcamp);
+    this.constructor.getAverageCost(this.coachingcenter);
   });
   
   

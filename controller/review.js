@@ -8,7 +8,7 @@ const CoachingCenter = require('../Model/coachingCenter');
 // @access    Public
 exports.getReviews = asyncHandler(async (req, res, next) => {
     console.log(req.params.coachingcenterId)
-    const reviews = await Review.find({ bootcamp: req.params.coachingCenterId });
+    const reviews = await Review.find({ coachingcenter: req.params.coachingCenterId });
 
     return res.status(200).json({
       success: true,
@@ -22,7 +22,7 @@ exports.getReviews = asyncHandler(async (req, res, next) => {
 // @access    Public
 exports.getReview = asyncHandler(async (req, res, next) => {
   const review = await Review.findById(req.params.id).populate({
-    path: 'bootcamp',
+    path: 'coachingcenter',
     select: 'name description'
   });
 
@@ -42,7 +42,7 @@ exports.getReview = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/coachingcenter/:coachingcenterId/reviews
 // @access    Private
 exports.addReview = asyncHandler(async (req, res, next) => {
-  req.body.bootcamp = req.params.coachingCenterId;
+  req.body.coachingcenter = req.params.coachingCenterId;
   req.body.user = req.user.id;
 
   const coachingcenter = await CoachingCenter.findById(req.params.coachingCenterId);
@@ -50,7 +50,7 @@ exports.addReview = asyncHandler(async (req, res, next) => {
   if (!coachingcenter) {
     return next(
       new ErrorClass(
-        `No bootcamp with the id of ${req.params.bootcampId}`,
+        `No coaching center with the id of ${req.params.coachingCenterId}`,
         404
       )
     );
@@ -110,7 +110,6 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
   }
 
   await review.remove();
-
   res.status(200).json({
     success: true,
     data: {}

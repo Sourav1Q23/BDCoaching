@@ -135,10 +135,10 @@ CoachingCenterSChema.pre('save', async function(next) {
   });
 
   
-// Cascade delete courses when a bootcamp is deleted
+// Cascade delete courses when a coachingcenter is deleted
 CoachingCenterSChema.pre('remove', async function(next) {
-  console.log(`Courses being removed from bootcamp ${this._id}`);
-  await this.model('Course').deleteMany({ bootcamp: this._id });
+  console.log(`Courses being removed from coaching center ${this._id}`);
+  await this.model('Course').deleteMany({ coachingcenter: this._id });
   next();
 });
 
@@ -146,7 +146,7 @@ CoachingCenterSChema.pre('remove', async function(next) {
 CoachingCenterSChema.virtual('courses', {
   ref: 'Course',
   localField: '_id',
-  foreignField: 'bootcamp',
+  foreignField: 'coachingcenter',
   justOne: false
 });
 

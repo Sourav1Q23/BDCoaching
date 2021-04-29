@@ -21,7 +21,7 @@ const ReviewSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  bootcamp: {
+  coachingcenter: {
     type: mongoose.Schema.ObjectId,
     ref: 'CoachingCenter',
     required: true
@@ -33,25 +33,25 @@ const ReviewSchema = new mongoose.Schema({
   }
 });
 
-// Prevent user from submitting more than one review per bootcamp
-ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true });
+// Prevent user from submitting more than one review per coachingcenter
+ReviewSchema.index({ coachingcenter: 1, user: 1 }, { unique: true });
 
 // Static method to get avg rating and save
-ReviewSchema.statics.getAverageRating = async function(bootcampId) {
+ReviewSchema.statics.getAverageRating = async function(coachingCenterId) {
   const obj = await this.aggregate([
     {
-      $match: { bootcamp: bootcampId }
+      $match: { coachingcenter: coachingCenterId }
     },
     {
       $group: {
-        _id: '$bootcamp',
+        _id: '$coachingcenter',
         averageRating: { $avg: '$rating' }
       }
     }
   ]);
 
   try {
-    await this.model('CoachingCenter').findByIdAndUpdate(bootcampId, {
+    await this.model('CoachingCenter').findByIdAndUpdate(coachingCenterId, {
       averageRating: obj[0].averageRating
     });
   } catch (err) {
@@ -61,12 +61,12 @@ ReviewSchema.statics.getAverageRating = async function(bootcampId) {
 
 // Call getAverageCost after save
 ReviewSchema.post('save', function() {
-  this.constructor.getAverageRating(this.bootcamp);
+  this.constructor.getAverageRating(this.coachingcenter);
 });
 
 // Call getAverageCost before remove
 ReviewSchema.pre('remove', function() {
-  this.constructor.getAverageRating(this.bootcamp);
+  this.constructor.getAverageRating(this.coachingcenter);
 });
 
 module.exports = mongoose.model('Review', ReviewSchema);

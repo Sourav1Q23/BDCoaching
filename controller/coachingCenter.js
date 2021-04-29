@@ -4,8 +4,8 @@ const ErrorClass = require('./../config/errorClass');
 const asyncHandler= require('./../middleware/asyncHandler');
 const geocoder = require('./../config/geocoder')
 
-//@desc Get All Bootcamps
-//route GET api/v1/bootcamps
+//@desc Get All Coaching Center
+//route GET api/v1/coachingcenters
 //access Public
 
 exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
@@ -70,15 +70,15 @@ exports.getCoachingcenters = asyncHandler(async (req, res , next) => {
     });        
 })
 
-//@desc Get a Bootcamps
-//route GET api/v1/bootcamps/:id
+//@desc Get a coaching center
+//route GET api/v1/coachingcenters/:id
 //access Public
 
 exports.getCoachingcenter =asyncHandler(async (req, res , next) => {
         const coachingCenter = await CoachingCenter.findById(req.params.id)
         
         if (!coachingCenter){
-            return next(new ErrorClass(`Bootcamp not found with id of ${req.params.id}`, 404))
+            return next(new ErrorClass(`Coaching center not found with id of ${req.params.id}`, 404))
         }
         res.status(200).json({
             status: "Success",
@@ -87,8 +87,8 @@ exports.getCoachingcenter =asyncHandler(async (req, res , next) => {
     
 })
 
-//@desc Create a Bootcamps
-//route POST api/v1/bootcamps/
+//@desc Create a Coaching Center
+//route POST api/v1/coachingcenters/
 //access private
 
 exports.createCoachingcenter = asyncHandler(async (req, res , next) => {
@@ -97,7 +97,7 @@ exports.createCoachingcenter = asyncHandler(async (req, res , next) => {
     const publishedCoachingCenter = await CoachingCenter.findOne({ user:req.user.id})
 
     if(publishedCoachingCenter && !req.user.role!=='admin'){
-        return next(new ErrorClass('The User already published a Coachin Ceter',401))
+        return next(new ErrorClass('The User already published a Coaching Center',401))
     }
 
     const coachingCenter = await CoachingCenter.create(req.body)
@@ -108,8 +108,8 @@ exports.createCoachingcenter = asyncHandler(async (req, res , next) => {
     });
 })
 
-//@desc Update a Bootcamps
-//route PUT api/v1/bootcamps/
+//@desc Update a coachingcenter
+//route PUT api/v1/coachingcenters/:id
 //access private
 
 exports.updateCoachingcenter = asyncHandler(async (req, res , next) => {
@@ -119,7 +119,7 @@ exports.updateCoachingcenter = asyncHandler(async (req, res , next) => {
         return next(new ErrorClass(`No coaching center found with id ${req.params.id}`,404))
     }
     if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
-        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this CoachingCenter`,401))
+        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this Coaching Center`,401))
     }
 
     coachingCenter = await CoachingCenter.findByIdAndUpdate(req.params.id, req.body, {
@@ -137,8 +137,8 @@ exports.updateCoachingcenter = asyncHandler(async (req, res , next) => {
     }); 
 })
 
-//@desc Delete a Bootcamps
-//route DELETE api/v1/bootcamps/
+//@desc Delete a coaching Center
+//route DELETE api/v1/coachingcenters/:id
 //access private
 
 exports.deleteCoachingcenter = asyncHandler(async(req, res , next) => {
@@ -158,8 +158,8 @@ exports.deleteCoachingcenter = asyncHandler(async(req, res , next) => {
         });        
 })
 
-// @desc      Get bootcamps within a radius
-// @route     GET /api/v1/bootcamps/radius/:zipcode/:distance
+// @desc      Get coaching center within a radius
+// @route     GET /api/v1/coachingcenters/radius/:zipcode/:distance
 // @access    Private
 exports.getCoachingCenterInRadius = asyncHandler(async (req, res, next) => {
     const { zipcode, distance } = req.params;
@@ -185,8 +185,8 @@ exports.getCoachingCenterInRadius = asyncHandler(async (req, res, next) => {
     });
   });
   
-//@desc Delete a Bootcamps
-//route DELETE api/v1/bootcamps/
+//@desc Coaching Center Image Upload
+//route PUT api/v1/coachingcenters/:id/upload
 //access private
 
 exports.coachingCenterFileUpload = asyncHandler(async(req, res , next) => {
@@ -196,7 +196,7 @@ exports.coachingCenterFileUpload = asyncHandler(async(req, res , next) => {
         return next(new ErrorClass(`No coaching center found with id ${req.params.id}`,404))
     }
     if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
-        return next(new ErrorClass(`User ${req.user.id} is not authorziedto update this CoachingCenter`,401))
+        return next(new ErrorClass(`User ${req.user.id} is not authorzied to update this CoachingCenter`,401))
     }
     if (!req.files){
         return next(new ErrorClass("No fle Uploaded",400))

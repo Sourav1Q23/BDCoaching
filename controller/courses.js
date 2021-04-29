@@ -11,13 +11,13 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
     let query;
     
     if (req.params.coachingCenterId) {
-        query =  Course.find({ bootcamp: req.params.coachingCenterId  });
+        query =  Course.find({ coachingcenter: req.params.coachingCenterId  });
      } else{
         query = Course.find()
     }    
 
     query= query.populate({
-        path: 'bootcamp'
+        path: 'coachingcenter'
         ,select:'name description'
     })
     const courses= await query
@@ -33,7 +33,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
 // @access    Public
 exports.getCourse = asyncHandler(async (req, res, next) => {
     const course = await Course.findById(req.params.id).populate({
-        path:'bootcamp',
+        path:'coachingcenter',
         select:'name description'
     })
 
@@ -52,7 +52,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/coachingCenterId/:coachingCenterId/courses
 // @access    Private
 exports.createCourse = asyncHandler(async (req, res, next) => {
-    req.body.bootcamp =req.params.coachingCenterId
+    req.body.coachingcenter =req.params.coachingCenterId
     req.body.user = req.user.id;
     
     const coachingCenter = await CoachingCenter.findById(req.params.coachingCenterId)
@@ -64,7 +64,7 @@ exports.createCourse = asyncHandler(async (req, res, next) => {
     if (coachingCenter.user.toString()!== req.user.id && req.user.role!=='admin'){
         return next(new ErrorClass(`User ${req.user.id} is not authorziedto Create the course`,401))
     }
-    req.body.bootcamp = req.params.coachingCenterId
+    req.body.coachingcenter = req.params.coachingCenterId
 
     const course = await Course.create(req.body)
 
