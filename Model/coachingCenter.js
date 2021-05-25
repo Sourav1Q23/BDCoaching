@@ -61,12 +61,13 @@ const CoachingCenterSChema = new mongoose.Schema(
       type: [String],
       required: true,
       enum: [
-        'Web Development',
-        'Mobile Development',
-        'UI/UX',
-        'Data Science',
-        'Business',
-        'Other'
+        'SSC',
+        'HSC',
+        'JSC',
+        'Medical Admission',
+        'University Admission',
+        'Engineering Admission',
+        'Regular'
       ]
     },
     averageRating: {
@@ -78,22 +79,6 @@ const CoachingCenterSChema = new mongoose.Schema(
     photo: {
       type: String,
       default: 'no-photo.jpg'
-    },
-    housing: {
-      type: Boolean,
-      default: false
-    },
-    jobAssistance: {
-      type: Boolean,
-      default: false
-    },
-    jobGuarantee: {
-      type: Boolean,
-      default: false
-    },
-    acceptGi: {
-      type: Boolean,
-      default: false
     },
     createdAt: {
       type: Date,
